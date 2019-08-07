@@ -684,7 +684,8 @@ NodeGoogleDrive.prototype.updateRevisions = function(fileId, revisionId) {
       fileId: fileId,
       revisionId: revisionId,
       resource: {
-        published: true
+        published: true,
+        publishAuto: true
       },
     }
 
