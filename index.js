@@ -62,7 +62,8 @@ var NodeGoogleDrive = function(options) {
   // var jwt_client;
 
   _this.service = {
-    files: null
+    files: null,
+    revisions: null
   };
 
   /**
@@ -80,7 +81,7 @@ var NodeGoogleDrive = function(options) {
       return service;
     }).then(function(service) {
       _this.service.files = Promise.promisifyAll(service.files);
-
+      _this.service.revisions = Promise.promisifyAll(service.revisions);
       return _this.service;
     });
   };
@@ -348,6 +349,7 @@ NodeGoogleDrive.prototype.exportFile = function(
 
   return new Promise((resolve, reject) => {
     let string = ''
+    console.log(_this.service)
     _this.service.files
       .export(request)
       .on('data',function(data){
@@ -483,6 +485,7 @@ NodeGoogleDrive.prototype.listFolders = function(
  *
  * @returns {Promise<Object>} the response from google drive
  */
+
 NodeGoogleDrive.prototype.writeTextFile = function(
   content,
   parentFolder,
@@ -657,5 +660,47 @@ NodeGoogleDrive.prototype.createFolder = function(parentFolder, folderName) {
       throw err;
     });
 };
+
+NodeGoogleDrive.prototype.listRevisions = function(fileId) {
+  let _this = this,
+    request = {
+      fileId: fileId
+    }
+
+  return new Promise((resolve, reject) => {
+    _this.service.revisions
+      .listAsync(request)
+      .then((data) => {
+        // console.log(data)
+        resolve(data)
+      })
+      // .pipe(dest);
+  });
+};
+
+NodeGoogleDrive.prototype.updateRevisions = function(fileId, revisionId) {
+  let _this = this,
+    request = {
+      fileId: fileId,
+      revisionId: revisionId,
+      resource: {
+        published: true
+      },
+    }
+
+  return new Promise((resolve, reject) => {
+    _this.service.revisions
+      .update(request)
+      .on('end', () => {
+        resolve(true)
+      })
+      // .then((data) => {
+      //   // console.log(data)
+      //   resolve(data)
+      // })
+      // .pipe(dest);
+  });
+};
+
 
 module.exports = NodeGoogleDrive;
