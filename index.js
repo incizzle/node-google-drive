@@ -343,19 +343,22 @@ NodeGoogleDrive.prototype.exportFile = function(
       fileId: file.id,
       mimeType: mimeType
     },
-    destination = `${destinationFolder || '/tmp'}/${file.name}.${extension}`,
-    dest = fs.createWriteStream(destination);
+    destination = `${destinationFolder || '/tmp'}/${file.name}.${extension}`
+    // dest = fs.createWriteStream(destination);
 
   return new Promise((resolve, reject) => {
+    let string = ''
     _this.service.files
       .export(request)
+      .on('data',function(data){
+        string += data.toString();
+      })
       .on('end', function() {
-        resolve(destination);
+        resolve(string);
       })
       .on('error', function(err) {
         reject(err);
       })
-      .pipe(dest);
   });
 };
 
